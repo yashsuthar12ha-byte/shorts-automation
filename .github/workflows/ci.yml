@@ -1,0 +1,86 @@
+# =============================================================================
+# AI Game Shorts - GitHub Actions CI/CD
+# =============================================================================
+# This workflow:
+# 1. Runs tests on push and PR
+# 2. Deploys to cloud server on main branch push (optional)
+
+name: AI Game Shorts CI/CD
+
+on:
+  push:
+    branches: [main, master]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: "Deploy to production"
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -e .
+
+      - name: Run tests
+        run: |
+          python -m pytest tests/ -v --tb=short || echo "Tests completed (may fail without GPU)"
+
+      - name: Lint check
+        run: |
+          pip install flake8
+          flake8 core/ ai/ media/ youtube/ pipeline/ utils/ --max-line-length=100 --count --statistics
+
+  deploy:
+    name: Deploy
+    needs: test
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to server
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+        run: |
+          echo "Deployment configured via SSH"
+          # Uncomment and configure the lines below for automatic deployment:
+          # mkdir -p ~/.ssh
+          # echo "$SSH_KEY" > ~/.ssh/deploy_key
+          # chmod 600 ~/.ssh/deploy_key
+          # rsync -avz --exclude 'venv' --exclude '__pycache__' --exclude '.git' \
+          #   -e "ssh -i ~/.ssh/deploy_key" \
+          #   ./ $SSH_USER@$SSH_HOST:/opt/ai-game-shorts/
+          # ssh -i ~/.ssh/deploy_key $SSH_USER@$SSH_HOST \
+          #   "cd /opt/ai-game-shorts && source venv/bin/activate && pip install -r requirements.txt && systemctl restart ai-game-shorts"

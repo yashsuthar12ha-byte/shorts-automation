@@ -1,0 +1,42 @@
+# Byte-compiled
+__pycache__/
+*.py[cod]
+
+# Environment
+.env
+*.env
+
+# Secrets
+config/youtube_credentials.json
+output/youtube_token.json
+
+# Output
+output/
+!output/.gitkeep
+
+# Sample data
+sample_data/
+!sample_data/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temp
+temp/
+*.tmp
+
+# Distributions
+dist/
+*.egg-info/
+build/

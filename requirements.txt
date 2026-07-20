@@ -1,0 +1,40 @@
+# Core (pre-built wheels only - no C compiler needed)
+opencv-python-headless>=4.8.0
+numpy>=1.24.0,<2.0.0
+scipy>=1.10.0
+
+# Video/Audio Processing
+moviepy>=1.0.3
+ffmpeg-python>=0.2.0
+pydub>=0.25.1
+
+# AI/ML
+openai>=1.30.0
+google-generativeai>=0.7.0
+openai-whisper>=20231117
+
+# Image/Thumbnail
+Pillow>=10.3.0
+
+# YouTube API
+google-auth>=2.29.0
+google-auth-oauthlib>=1.2.0
+google-auth-httplib2>=0.2.0
+google-api-python-client>=2.130.0
+
+# Utilities
+pyyaml>=6.0.1
+python-dotenv>=1.0.1
+requests>=2.31.0
+tqdm>=4.66.4
+schedule>=1.2.1
+pandas>=2.0.0
+rich>=13.7.1
+loguru>=0.7.2
+
+# CLI
+click>=8.1.7
+
+# Testing
+pytest>=8.2.0
+pytest-mock>=3.14.0

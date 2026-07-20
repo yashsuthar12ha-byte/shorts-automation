@@ -1,0 +1,169 @@
+# =============================================================================
+# AI Game Shorts - Main Configuration
+# =============================================================================
+# Edit this file to customize your AI YouTube Shorts creator.
+# YAML format - easy to read and modify.
+
+# --- General Settings ---
+general:
+  project_name: "AI Game Shorts"
+  output_dir: "output"
+  temp_dir: "output/temp"
+  log_level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  max_workers: 2     # Parallel processing threads
+
+# --- Video Input ---
+video_input:
+  source: "local"           # "local", "youtube_dl", "stream"
+  input_dir: "sample_data"  # Folder containing raw gameplay videos
+  supported_formats:
+    - ".mp4"
+    - ".mov"
+    - ".avi"
+    - ".mkv"
+    - ".webm"
+
+# --- Shorts Generation Settings ---
+shorts:
+  target_duration_seconds: 58   # YouTube Shorts max is 60s
+  min_clip_duration: 15         # Minimum clip length
+  max_clip_duration: 58         # Maximum clip length
+  aspect_ratio: "9:16"          # Portrait mode for Shorts
+  resolution: [1080, 1920]      # Width x Height
+  fps: 30
+  transition: "fade"            # "cut", "fade", "crossfade"
+  background_music:
+    enabled: true
+    volume: 0.15                # 0.0 to 1.0
+    library_dir: "output/music" # Place .mp3 files here
+    auto_generate: false        # Use AI to generate music (future)
+
+# --- AI Provider ---
+# Choose ONE: "openai" or "gemini"
+ai:
+  provider: "openai"  # "openai" or "gemini"
+  openai:
+    model: "gpt-4o"           # or "gpt-4o-mini" for lower cost
+    max_tokens: 2000
+    temperature: 0.7
+  gemini:
+    model: "gemini-1.5-pro"   # or "gemini-1.5-flash" for lower cost
+    temperature: 0.7
+  whisper:
+    model: "base"             # "tiny", "base", "small", "medium", "large"
+    language: "en"
+
+# --- Scene Detection ---
+scene_detection:
+  method: "hybrid"        # "content", "audio", "hybrid"
+  threshold: 30.0         # Scene change sensitivity (lower = more sensitive)
+  min_scene_length: 3.0   # Minimum seconds for a scene
+  analyze_audio_peaks: true
+
+# --- Highlight Detection ---
+highlight_detection:
+  methods:
+    - "audio_excitement"     # Detect spikes in volume/spectrum
+    - "motion_intensity"     # Detect fast movement
+    - "ai_content_analysis"  # AI-based understanding
+    - "subtitle_keywords"    # Match keywords like "boss", "wow", etc.
+  excitement_threshold: 0.7  # 0.0 to 1.0
+  max_highlights_per_video: 10
+
+# --- Caption Settings ---
+captions:
+  enabled: true
+  position: "bottom"     # "bottom", "top", "center"
+  font_size: 36
+  font_color: "white"
+  stroke_color: "black"
+  stroke_width: 2
+  animation: "typewriter"  # "typewriter", "fade", "none"
+  max_words_per_line: 4
+  highlight_keywords: true  # Bold/color important words
+
+# --- Title Generation ---
+titles:
+  style: "click_optimized"  # "click_optimized", "descriptive", "funny"
+  max_length: 100           # YouTube title limit
+  include_game_name: true
+  include_emojis: true
+  templates:
+    - "{emoji} {title} 🔥"
+    - "🤯 {title} - {game}"
+    - "This {moment} in {game} is INSANE!"
+    - "{game}: {title} 🎮"
+    - "You WON'T BELIEVE this {game} moment!"
+    - "{adjective} {moment} in {game} 😱"
+
+# --- Hashtag Settings ---
+hashtags:
+  count: 8                 # Number of hashtags per Short
+  include_trending: true
+  include_game_tags: true
+  max_hashtag_length: 20
+  templates:
+    - "#gaming"
+    - "#shorts"
+    - "#{game}"
+    - "#gamingontiktok"
+    - "#gamer"
+    - "#videogames"
+
+# --- Thumbnail Generation ---
+thumbnail:
+  enabled: true
+  style: "dynamic"         # "dynamic", "text_overlay", "collage"
+  text_overlay: true       # Add text on thumbnail
+  font_color: "white"
+  background_color: "black"
+  include_game_logo: false # Requires game logo images
+
+# --- YouTube Upload ---
+youtube:
+  upload:
+    privacy: "public"      # "public", "unlisted", "private"
+    category: "Gaming"     # YouTube category
+    language: "en"
+    auto_playlist: true    # Add to a playlist
+    playlist_name: "AI Generated Shorts"
+  schedule:
+    enabled: true
+    max_per_day: 3          # Max uploads per day
+    best_times:             # Posting schedule (UTC)
+      - "12:00"             # Lunch time
+      - "15:00"             # Afternoon
+      - "19:00"             # Prime time
+      - "21:00"             # Evening
+    timezone: "UTC"
+    days: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+
+# --- Analytics & Learning ---
+analytics:
+  enabled: true
+  track_metrics:
+    - "views"
+    - "likes"
+    - "comments"
+    - "shares"
+    - "ctr"              # Click-through rate
+    - "retention"        # Average view duration %
+    - "subscribers_gained"
+  learning:
+    enabled: true
+    improve_titles: true
+    improve_thumbnails: true
+    improve_hashtags: true
+    improve_clip_selection: true
+    feedback_window_days: 7  # Analyze performance after 7 days
+
+# --- API Keys ---
+# IMPORTANT: Set these as environment variables for security:
+#   AI_GAME_SHORTS_OPENAI_KEY
+#   AI_GAME_SHORTS_GEMINI_KEY
+#   AI_GAME_SHORTS_YOUTUBE_CLIENT_SECRET
+secrets:
+  openai_api_key_env: "AI_GAME_SHORTS_OPENAI_KEY"
+  gemini_api_key_env: "AI_GAME_SHORTS_GEMINI_KEY"
+  youtube_client_secret_env: "AI_GAME_SHORTS_YOUTUBE_CLIENT_SECRET"
+  youtube_token_env: "AI_GAME_SHORTS_YOUTUBE_TOKEN"

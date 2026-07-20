@@ -1,0 +1,116 @@
+# =============================================================================
+# AI Prompts Configuration
+# =============================================================================
+# Edit these prompts to customize how the AI generates content.
+# {placeholder} values are filled automatically by the code.
+
+# --- Scene Analysis Prompt ---
+scene_analysis: |
+  You are an expert video game analyst. Analyze the following scene description
+  from the game "{game_name}" and determine what type of moment it is.
+
+  Scene context: {scene_context}
+  Audio cues: {audio_cues}
+  Visual changes: {visual_changes}
+  Detected text/subtitles: {subtitles}
+
+  Classify this scene as ONE of these types:
+  - CUTSCENE (story-driven cinematic)
+  - GAMEPLAY (regular gameplay)
+  - BOSS_FIGHT (boss encounter)
+  - COMBAT (general combat)
+  - EXPLORATION (exploring environment)
+  - DIALOGUE (character conversation)
+  - QTE (quick time event)
+  - TRANSITION (loading/traveling)
+  - MENU (UI/inventory)
+
+  Also rate on a scale of 1-10:
+  - excitement_level: (how exciting is this scene)
+  - story_importance: (how important to the story)
+  - humor_level: (how funny)
+  - epicness: (how epic/cinematic)
+  - emotional_impact: (how emotional)
+
+  Respond ONLY with a JSON object:
+  {{"scene_type": "...", "excitement_level": N, "story_importance": N,
+    "humor_level": N, "epicness": N, "emotional_impact": N,
+    "summary": "One line description", "is_highlight": true/false}}
+
+# --- Title Generation Prompt ---
+title_generation: |
+  You are an expert YouTube Shorts title writer for gaming content.
+  Generate a catchy, click-optimized title for a YouTube Short about
+  {game_name}.
+
+  Scene type: {scene_type}
+  What happens: {scene_description}
+  Excitement level: {excitement}/10
+  Humor level: {humor}/10
+  Epicness: {epicness}/10
+
+  Title style: {style}
+  Max length: {max_length} characters
+  {emoji_instruction}
+
+  Requirements:
+  - Create curiosity gaps
+  - Use power words
+  - Sound natural, not clickbait-y
+  - Mention the game naturally
+  - {style_specific_instructions}
+
+  Generate 5 title options. Return as JSON:
+  {{"titles": ["title1", "title2", "title3", "title4", "title5"]}}
+
+# --- Hashtag Generation Prompt ---
+hashtag_generation: |
+  You are a social media hashtag expert for gaming content.
+  Generate {count} hashtags for a YouTube Short about {game_name}.
+
+  Scene: {scene_description}
+  Scene type: {scene_type}
+
+  Requirements:
+  - Mix of broad gaming tags and specific game tags
+  - Include trending formats
+  - Max {max_length} characters per tag
+  - Include #{game_name_short} if applicable
+
+  Return as JSON:
+  {{"hashtags": ["tag1", "tag2", "tag3", ...]}}
+
+# --- Highlight Selection Prompt ---
+highlight_selection: |
+  You are an expert video editor specializing in gaming highlights.
+  Review these detected moments from {game_name} and select the BEST
+  ones for a YouTube Short (under 60 seconds).
+
+  Available moments:
+  {moments}
+
+  Selection criteria:
+  1. Most visually impressive/engaging
+  2. Best story context (can be understood in isolation)
+  3. Highest excitement/epicness
+  4. Good pacing (variety of moment types)
+  5. Self-contained (doesn't need prior context)
+
+  Select the top {max_clips} moments and arrange them in the best order.
+  Return as JSON:
+  {{"selected_moments": [
+    {{"index": N, "start_time": "MM:SS", "end_time": "MM:SS",
+      "reason": "why this was chosen"}
+  ]}}
+
+# --- Scene Description Prompt (for AI-based scene detection) ---
+scene_description: |
+  Describe what is happening in this video frame from {game_name} in
+  one sentence. Focus on:
+  - What the player is doing
+  - What characters/ enemies are visible
+  - The environment
+  - Any UI elements
+  - Action intensity
+
+  Description:
