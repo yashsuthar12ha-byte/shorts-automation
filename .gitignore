@@ -40,3 +40,11 @@ temp/
 dist/
 *.egg-info/
 build/
+
+# FFmpeg binaries (downloaded by build script)
+ffmpeg_bin/
+
+
+# FFmpeg binaries
+ffmpeg_bin/
+

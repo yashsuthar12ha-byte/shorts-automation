@@ -1,0 +1,86 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (e.g., 1.0.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          .\venv\Scripts\Activate.ps1
+          pip install -r requirements.txt --quiet
+          pip install pyinstaller --quiet
+
+      - name: Download FFmpeg
+        run: |
+          New-Item -ItemType Directory -Path ffmpeg_bin -Force | Out-Null
+          $url = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
+          Invoke-WebRequest -Uri $url -OutFile "$env:TEMP\ffmpeg.zip" -UseBasicParsing
+          Expand-Archive "$env:TEMP\ffmpeg.zip" "$env:TEMP\ffmpeg_extracted" -Force
+          Get-ChildItem "$env:TEMP\ffmpeg_extracted" -Recurse -Include "ffmpeg.exe","ffprobe.exe" | ForEach-Object {
+            Copy-Item $_.FullName "ffmpeg_bin\$($_.Name)" -Force
+          }
+
+      - name: Build with PyInstaller
+        run: |
+          .\venv\Scripts\Activate.ps1
+          .\venv\Scripts\python.exe -m PyInstaller ai_game_shorts.spec --clean --noconfirm
+        continue-on-error: true
+
+      - name: Package portable build
+        run: |
+          if (Test-Path "dist\AI_Game_Shorts") {
+            Compress-Archive -Path "dist\AI_Game_Shorts\*" -DestinationPath "AI_Game_Shorts_Portable.zip" -Force
+          }
+          # Always create source package
+          Compress-Archive -Path ".\*" -DestinationPath "AI_Game_Shorts_Source.zip" -Force -Exclude "venv","__pycache__",".git","*.pyc"
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "AI Game Shorts v${{ github.event.inputs.version || github.ref_name }}"
+          body: |
+            ## AI Game Shorts - One Click Software
+            
+            ### Download Options:
+            📦 **AI_Game_Shorts_Portable.zip** - Standalone EXE (no Python needed, ~1GB)
+            📦 **AI_Game_Shorts_Source.zip** - Source code + launcher (Python needed, ~30MB)
+            
+            ### How to Use (Portable):
+            1. Extract ZIP
+            2. Run `AI_Game_Shorts.exe`
+            
+            ### How to Use (Source):
+            1. Extract ZIP
+            2. Double-click `setup_and_run.bat` (auto setup)
+            
+            ### Features:
+            - Autonomous AI YouTube Shorts Creator
+            - Scene Detection, Highlight Analysis
+            - AI Captions (Whisper), Titles, Hashtags
+            - YouTube Upload with scheduling
+            - Self-learning analytics
+          files: |
+            AI_Game_Shorts_Portable.zip
+            AI_Game_Shorts_Source.zip
